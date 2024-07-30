@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Counter</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Object Counter</h1>
+        <form id="uploadForm">
+            <input type="file" id="imageInput" accept="image/*" required>
+            <button type="submit">Count Objects</button>
+        </form>
+        <img id="imagePreview" alt="Image preview">
+        <div id="loading">Processing...</div>
+        <div id="result"></div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>

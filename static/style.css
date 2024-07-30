@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+#uploadForm {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#imagePreview {
+    max-width: 100%;
+    display: none;
+    margin-bottom: 20px;
+}
+
+#loading {
+    display: none;
+    text-align: center;
+    font-weight: bold;
+}
+
+#result {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    font-weight: bold;
+}
