@@ -4,19 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Object Counter</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Object Counter</h1>
-        <form id="uploadForm">
-            <input type="file" id="imageInput" accept="image/*" required>
-            <button type="submit">Count Objects</button>
-        </form>
-        <img id="imagePreview" alt="Image preview">
-        <div id="loading">Processing...</div>
-        <div id="result"></div>
+        <header>
+            <h1><i class="fas fa-camera"></i> Object Counter</h1>
+        </header>
+        <main>
+            <section class="upload-section">
+                <h2>Upload an Image</h2>
+                <form id="uploadForm">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="imageInput" accept="image/*" required>
+                        <label for="imageInput" class="file-input-label">
+                            <i class="fas fa-cloud-upload-alt"></i> Choose an image
+                        </label>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-search"></i> Count Objects
+                    </button>
+                </form>
+            </section>
+            <section class="preview-section">
+                <h2>Image Preview</h2>
+                <div class="image-preview-container">
+                    <img id="imagePreview" alt="Image preview">
+                    <p id="dropInstructions">Drop image here</p>
+                </div>
+            </section>
+            <section class="result-section">
+                <div id="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Processing...
+                </div>
+                <div id="result"></div>
+            </section>
+        </main>
     </div>
-    <script src="js/main.js"></script>
+    <script src="../static/main.js"></script>
 </body>
 </html>
