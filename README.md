@@ -3,10 +3,9 @@
 Task -<br/>
 To develop an application that automates the counting of sheet stacks in a manufacturing plant. The goal is to create a solution that can accurately count the number of sheets from images of stacks
 <br/><br/>
-Objectives -<br/>
-1. A computer vision application.<br/>
-2. User-friendly interface.<br/>
+Features -<br/>
+1. A CV application based on edge detection .<br/>
+2. User-friendly web app interface.<br/>
 3. Efficient and accurate with minimal latency.<br/>
-
 
 
