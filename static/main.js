@@ -1,55 +1,28 @@
-
-const URL = "https://teachablemachine.withgoogle.com/models/xvJD7urTu/";
-const modelURL = URL + "model.json";
-const metadataURL = URL + "metadata.json";
-
-let model, labelContainer, maxPredictions;
-
-async function init() {
-    model = await tmImage.load(modelURL, metadataURL);
-    maxPredictions = model.getTotalClasses();
-
-    labelContainer = document.getElementById("label-container");
-    for (let i = 0; i < maxPredictions; i++) {
-        labelContainer.appendChild(document.createElement("div"));
-    }
-}
-
-async function predictNow(input) {
-    try {
-        const prediction = await model.predict(input);
-        for (let i = 0; i < maxPredictions; i++) {
-            const probability = prediction[i].probability.toFixed(2) * 100;
-            const progress = '<div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: ' + probability + '%" aria-valuenow="' + probability + '" aria-valuemin="0" aria-valuemax="100">' + probability + '%</div></div>';
-            const classPrediction = prediction[i].className + progress;
-            labelContainer.childNodes[i].innerHTML = classPrediction;
-        }
-    } catch (error) {
-        console.error('Error predicting file:', error);
-    }
-}
-
+// Function to handle file selection and preview
 function handleFile(input) {
     if (input.files && input.files[0]) {
-        var file = input.files[0];
-        var reader = new FileReader();
-        
+        const file = input.files[0];
+        const reader = new FileReader();
+
         reader.onload = function(e) {
-            var fileType = file.type;
+            const fileType = file.type;
             if (fileType.startsWith('image/')) {
-                $('#imageArea').show();
-                $('#videoArea').hide();
-                $('#imageResult').attr('src', e.target.result);
-                $('#imageResult').attr('alt', file.name);
-                predictNow($('#imageResult')[0]);
+                document.getElementById('imageArea').style.display = 'block';
+                document.getElementById('videoArea').style.display = 'none';
+                document.getElementById('imageResult').src = e.target.result;
+                document.getElementById('imageResult').alt = file.name;
+                document.getElementById('predictSheetsBtn').style.display = 'block';
+                document.getElementById('processVideoBtn').style.display = 'none';
             } else if (fileType.startsWith('video/')) {
-                $('#videoArea').show();
-                $('#imageArea').hide();
-                $('#videoResult').attr('src', e.target.result);
-                $('#videoResult').attr('alt', file.name);
+                document.getElementById('videoArea').style.display = 'block';
+                document.getElementById('imageArea').style.display = 'none';
+                document.getElementById('videoResult').src = e.target.result;
+                document.getElementById('videoResult').alt = file.name;
+                document.getElementById('predictSheetsBtn').style.display = 'none';
+                document.getElementById('processVideoBtn').style.display = 'block';
             } else {
-                $('#imageArea').hide();
-                $('#videoArea').hide();
+                document.getElementById('imageArea').style.display = 'none';
+                document.getElementById('videoArea').style.display = 'none';
                 alert('Unsupported file type.');
             }
         };
@@ -57,23 +30,41 @@ function handleFile(input) {
     }
 }
 
-function countSheets() {
-    alert("Count Sheets functionality not implemented yet.");
+function predictSheets() {
+    const fileInput = document.getElementById('upload');
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/predict_image', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Estimated sheet count:', data.sheet_count);
+        document.getElementById('result-container').innerHTML = `<p class="text-white text-center">Estimated sheet count: ${data.sheet_count}</p>`;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result-container').innerHTML = `<p class="text-white text-center">Error: ${error}</p>`;
+    });
 }
 
-$(function() {
-    $('#upload').on('change', function() {
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('upload').addEventListener('change', function() {
         handleFile(this);
     });
+    
+    document.getElementById('upload').addEventListener('change', showFileName);
+
+    document.getElementById('predictSheetsBtn').addEventListener('click', predictSheets);
 });
 
-var input = document.getElementById('upload');
-var infoArea = document.getElementById('upload-label');
-
-input.addEventListener('change', showFileName);
-
+// Function to display selected file name
 function showFileName(event) {
     var input = event.srcElement;
     var fileName = input.files[0].name;
-    infoArea.textContent = 'File name: ' + fileName;
+    document.getElementById('upload-label').textContent = fileName;
 }
