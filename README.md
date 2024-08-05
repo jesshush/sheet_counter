@@ -35,6 +35,6 @@ $ python app.py
 
  > **Step 4** - Follow the local address link and click on the chat icon 
 
- PDF - [Open DOCX](https://docs.google.com/document/d/1wSuQIET0yOqcntjAnYaocc9rHXbUbQzus8p1Wog0_J0/edit?usp=sharing)
+ PDF - [Open DOCX](https://docs.google.com/document/d/1ayKaMQFL6sBegmvEYZuEtGYzfmwPNk_sN5ZvbC77Cu8/edit?usp=sharing)
 
  Demo Video - [Watch the video](https://www.youtube.com/watch?v=OUeXnvitgkU)
