@@ -1,62 +1,70 @@
-# app.py
-from flask import Flask, request, jsonify
-import tensorflow as tf
+from flask import Flask, request, jsonify, render_template
 import cv2
 import numpy as np
-from predict import predict_sheets, process_video
+from scipy.signal import find_peaks, savgol_filter
+import io
+from PIL import Image
 
 app = Flask(__name__)
 
-# Load the trained model
-model = tf.keras.models.load_model('sheet_counter_model.h5')
+def count_cardboard_sheets(image):
+    # Convert to grayscale and resize for faster processing
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.resize(gray, (800, int(800 * gray.shape[0] / gray.shape[1])))
+    
+    # Apply adaptive thresholding to handle varying lighting conditions
+    thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    
+    # Apply morphological operations to enhance edges
+    kernel = np.ones((3,3), np.uint8)
+    morph = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+    
+    # Edge detection
+    edges = cv2.Canny(morph, 50, 150)
+    
+    # Crop the region of interest
+    height, width = edges.shape
+    roi = edges[int(height*0.1):int(height*0.9), int(width*0.3):int(width*0.7)]
+    
+    # Calculate vertical intensity profile
+    intensity_profile = np.sum(roi, axis=1)
+    
+    # Apply Savitzky-Golay filter for smoothing
+    smoothed_profile = savgol_filter(intensity_profile, 15, 3)
+    
+    # Normalize the profile
+    normalized_profile = (smoothed_profile - np.min(smoothed_profile)) / (np.max(smoothed_profile) - np.min(smoothed_profile))
+    
+    # Find peaks with optimized parameters
+    peaks, _ = find_peaks(normalized_profile, height=0.2, distance=10, prominence=0.1)
+    
+    return len(peaks)
 
-@app.route('/predict_image', methods=['POST'])
-def predict_image():
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/predict-sheets', methods=['POST'])
+def predict_sheets():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'})
-    
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'})
-    
     if file:
-        # Read and preprocess the image
-        in_memory_file = file.read()
-        nparr = np.frombuffer(in_memory_file, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (224, 224))
-        img = img / 255.0
-        img = np.expand_dims(img, axis=0)
+        # Read the image file using PIL for faster processing
+        image = Image.open(io.BytesIO(file.read()))
+        image = np.array(image)
         
-        # Make prediction
-        prediction = model.predict(img)
-        sheet_count = int(round(prediction[0][0]))
+        # Count sheets
+        sheet_count = count_cardboard_sheets(image)
         
-        return jsonify({'sheet_count': sheet_count})
+        return jsonify({'prediction': sheet_count})
 
-@app.route('/process_video', methods=['POST'])
-def process_video_route():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'})
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'})
-    
-    if file:
-        # Save the video file temporarily
-        temp_path = 'temp_video.mp4'
-        file.save(temp_path)
-        
-        # Process the video
-        total_sheets = process_video(model, temp_path)
-        
-        # Remove the temporary file
-        import os
-        os.remove(temp_path)
-        
-        return jsonify({'total_sheets': total_sheets})
+@app.route('/process-video', methods=['POST'])
+def process_video():
+    # Placeholder for video processing
+    return jsonify({'result': 'Video processing not implemented yet'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

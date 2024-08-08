@@ -13,7 +13,7 @@ Features -<br/>
 
 ```bash
 $ git clone https://github.com/jesshush/sheet_counter.git
-$ cd jessup_cellars_chatbot
+$ cd sheet counter
 ```
 <br /> 
 
